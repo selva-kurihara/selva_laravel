@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->id();
+            $table->string('name_sei', 255)->comment('氏名（姓）');
+            $table->string('name_mei', 255)->comment('氏名（名）');
+            $table->string('nickname', 255)->comment('ニックネーム');
+            $table->integer('gender')->comment('性別（1=男性、2=女性）');
+            $table->string('password', 255)->comment('パスワード');
+            $table->string('email', 255)->comment('メールアドレス');
+            $table->integer('auth_code')->nullable()->comment('認証コード');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

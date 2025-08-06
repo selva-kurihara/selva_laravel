@@ -1,0 +1,105 @@
+body {
+    font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background-color: #f5f5dc;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.form-wrapper {
+    padding: 30px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+label {
+    min-width: 120px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 325px;
+}
+
+.name-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-inputs input {
+    width: 120px;
+}
+
+.name-inputs span {
+    font-size: 14px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-group label {
+    min-width: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+input[type="radio"] {
+    margin: 0;
+}
+
+.required {
+    color: red;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.submit-button {
+    background-color: #ff8c00;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 0;
+    font-weight: bold;
+}
+
+.submit-button-back {
+    background-color: white;
+    color: #ff8c00;
+    padding: 12px 40px;
+    border: #ff8c00 1px solid;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 0;
+    font-weight: bold;
+}
