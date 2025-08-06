@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MemberRequest extends FormRequest
 {
@@ -21,6 +22,10 @@ class MemberRequest extends FormRequest
      */
     public function rules(): array
     {
+        // 新規登録時: $memberId = null
+        // 編集時: $memberId = 実際のID
+        $memberId = $this->input('id');
+
         return [
             'name_sei' => [
                 'required',
@@ -60,7 +65,8 @@ class MemberRequest extends FormRequest
                 'required',
                 'string',
                 'email',
-                'max:200'
+                'max:200',
+                Rule::unique('members')->ignore($memberId)->whereNull('deleted_at'),
             ],
         ];
     }
