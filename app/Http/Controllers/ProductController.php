@@ -43,16 +43,37 @@ class ProductController extends Controller
    */
   public function confirm(ProductRequest $request)
   {
-    // 画像本体は不要なので除外
+    // 画像パス保持用
+    $paths = [];
+
+    for ($i = 0; $i < 4; $i++) {
+        if ($request->hasFile("images.$i") && $request->file("images.$i")->isValid()) {
+            // 新規アップロード → 一時保存
+            $paths[$i] = $request->file("images.$i")->store('tmp/products', 'public');
+        } else {
+            // 既存のパスを維持（hiddenから）
+            $paths[$i] = $request->input("imagePaths.$i") ?? '';
+        }
+    }
+
+    // $request の中に imagePaths を入れ直す
     $data = $request->except('images');
+    $data['imagePaths'] = $paths;
 
-    // セッションに保存
+    // 確認画面戻り or 初回エラー時用にセッションへ保存
     $request->session()->put('product_post_data', $data);
+    $request->session()->put('tmp_image_paths', $paths);
 
+    // カテゴリ名とサブカテゴリ名を取得
     $categoryName = ProductCategory::find($data['product_category_id'])->name ?? '';
     $subcategoryName = ProductSubcategory::find($data['product_subcategory_id'])->name ?? '';
 
-    return view('products.confirm', compact('data', 'categoryName', 'subcategoryName'));
+    return view('products.confirm', [
+        'data'            => $data,
+        'categoryName'    => $categoryName,
+        'subcategoryName' => $subcategoryName,
+        'imagePaths'      => $paths,
+    ]);
   }
 
   /**
@@ -81,12 +102,12 @@ class ProductController extends Controller
     }
 
     // 会員ID
-    $memberId = $request->user('members')->id;
+    $memberId = Auth::id();
 
     // 画像パス
     $paths = $data['imagePaths'] ?? [];
     for ($i = 0; $i < 4; $i++) {
-        $paths[$i] = $paths[$i] ?? null; // 未指定は null
+        $paths[$i] = $paths[$i] ?? null;
     }
 
     // 保存処理
@@ -100,7 +121,7 @@ class ProductController extends Controller
             $p = $paths[$i];
             if ($p) {
                 // セキュリティ: 想定外の場所を弾く（任意）
-                if (!str_starts_with($p, 'temp_images/')) {
+                if (!str_starts_with($p, 'tmp/products/')) {
                     throw new \RuntimeException('invalid image path: ' . $p);
                 }
                 $new = $dir . '/' . basename($p);
@@ -127,6 +148,7 @@ class ProductController extends Controller
 
     // セッションクリア
     $request->session()->forget('product_post_data');
+    $request->session()->forget('tmp_image_paths');
 
     return redirect()->route('top');
   }

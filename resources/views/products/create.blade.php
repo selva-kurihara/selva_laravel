@@ -45,38 +45,48 @@
     @enderror
 
     <div class="form-row">
-        <label>商品写真（最大4枚）</label>
+        <label>商品写真</label>
         <div class="product-images">
             @php
-                $oldImagePaths = old('imagePaths') ?? ($data['imagePaths'] ?? []);
+                $old      = old('imagePaths', []);
+                $session  = session('tmp_image_paths', []);
+                $oldImagePaths = [];
+
+                for ($i = 0; $i < 4; $i++) {
+                    $v = $old[$i] ?? null;
+                    if (empty($v)) {
+                        $v = $session[$i] ?? '';
+                    }
+                    $oldImagePaths[$i] = $v;
+                }
             @endphp
 
             @for ($i = 0; $i < 4; $i++)
-            @php $oldPath = $oldImagePaths[$i] ?? ''; @endphp
+                @php $oldPath = $oldImagePaths[$i] ?? ''; @endphp
 
-            <div class="image-slot">
-                <input
-                type="file"
-                name="images[{{ $i }}]"
-                accept="image/*"
-                id="image{{ $i }}"
-                style="display:none;"
-                onchange="previewImage(event, {{ $i }})"
-                >
+                <div class="image-slot">
+                    <input
+                    type="file"
+                    name="images[{{ $i }}]"
+                    accept="image/*"
+                    id="image{{ $i }}"
+                    style="display:none;"
+                    onchange="previewImage(event, {{ $i }})"
+                    >
 
-                <img
-                id="preview{{ $i }}"
-                src="{{ $oldPath ? Storage::url($oldPath) : '' }}"
-                alt="プレビュー"
-                style="{{ $oldPath ? '' : 'display:none;' }} max-width:150px; max-height:150px; margin-right:10px;"
-                >
+                    <img
+                    id="preview{{ $i }}"
+                    src="{{ $oldPath ? Storage::url($oldPath) : '' }}"
+                    alt="プレビュー"
+                    style="{{ $oldPath ? '' : 'display:none;' }} max-width:150px; max-height:150px; margin-right:10px;"
+                    >
 
-                <input type="hidden" name="imagePaths[{{ $i }}]" value="{{ $oldPath }}">
+                    <input type="hidden" name="imagePaths[{{ $i }}]" value="{{ $oldPath }}">
 
-                <button type="button" onclick="document.getElementById('image{{ $i }}').click()">
-                アップロード
-                </button>
-            </div>
+                    <button type="button" onclick="document.getElementById('image{{ $i }}').click()">
+                    アップロード
+                    </button>
+                </div>
             @endfor
         </div>
     </div>

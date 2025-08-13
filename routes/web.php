@@ -25,10 +25,13 @@ Route::post('/password/email', [PasswordResetController::class, 'sendResetEmail'
 Route::get('password/reset/{email}/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.update');
 
-Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-Route::post('/products/confirm', [ProductController::class, 'confirm'])->name('products.confirm');
-Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
-Route::get('/subcategories/{categoryId}', [ProductController::class, 'getSubcategories']);
-Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
+// ログイン時のみアクセス可能
+Route::middleware('auth')->group(function () {
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products/confirm', [ProductController::class, 'confirm'])->name('products.confirm');
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
+    Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
+    Route::get('/subcategories/{categoryId}', [ProductController::class, 'getSubcategories']);
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
+    Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
+});

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\UploadedFile;
 
 class ProductRequest extends FormRequest
 {
@@ -21,18 +22,22 @@ class ProductRequest extends FormRequest
   protected function prepareForValidation(): void
   {
     // 既存 hidden のパスをベースに
-    $paths = $this->input('imagePaths', []);
+    $paths = (array) $this->input('imagePaths', []);
 
     // 画像ファイルを保存
     for ($i = 0; $i < 4; $i++) {
-      $file = $this->file("images.$i");
-      if ($file && $file->isValid()) {  
-        $paths[$i] = $file->store('temp_images', 'public');
-      }
+        if ($this->hasFile("images.$i") && $this->file("images.$i")->isValid()) {
+            $paths[$i] = $this->file("images.$i")->store('tmp/products', 'public');
+        } elseif (!array_key_exists($i, $paths)) {
+            $paths[$i] = '';
+        }
     }
 
-    // リクエストにマージ
+    // リクエストにマージ（old() 用）
     $this->merge(['imagePaths' => $paths]);
+
+    // セッションにも一応入れておく（確認画面戻り用）
+    session()->put('tmp_image_paths', $paths);
   }
 
   /**
