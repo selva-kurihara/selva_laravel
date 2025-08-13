@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
-
-class Member extends Authenticatable
+class Product extends Model
 {
     use SoftDeletes;
-    protected $table = 'members';
+    protected $table = 'products';
 
     /**
      * The attributes that are mass assignable.
@@ -17,13 +16,15 @@ class Member extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name_sei',
-        'name_mei',
-        'nickname',
-        'gender',
-        'password',
-        'email',
-        'auth_code'
+        'member_id',
+        'product_category_id',
+        'product_subcategory_id',
+        'name',
+        'image_1',
+        'image_2',
+        'image_3',
+        'image_4',
+        'product_content',
     ];
 
     /**
@@ -32,8 +33,10 @@ class Member extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'auth_code',
+        'image_1',
+        'image_2',
+        'image_3',
+        'image_4',
     ];
 
     /**
@@ -42,7 +45,7 @@ class Member extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'password' => 'hashed',
-        'gender' => 'integer',
+        'product_category_id' => 'integer',
+        'product_subcategory_id' => 'integer',
     ];
 }

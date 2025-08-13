@@ -88,5 +88,8 @@
 
             <button type="submit" class="submit-button">確認画面へ</button>
         </form>
+        <form action="{{ url('/top') }}" method="GET">
+          <button type="submit" class="submit-button-back">トップに戻る</button>
+        </form>
     </div>
 @endsection

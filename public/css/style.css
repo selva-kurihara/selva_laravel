@@ -103,3 +103,51 @@ input[type="radio"] {
     margin: 30px auto 0;
     font-weight: bold;
 }
+
+/* ヘッダー全体の背景色と横並び */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f4e4d0; /* 薄いベージュ系背景色 */
+  padding: 10px 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* 左側（会員名表示）部分 */
+.header-left {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 右側のボタン群を横並びに */
+.header-right {
+  display: flex;
+  gap: 10px; /* ボタン間の間隔 */
+}
+
+/* フォームをインライン表示にして横並びに */
+.inline-form {
+  display: inline;
+}
+
+/* ボタンの基本スタイル */
+.inline-form button {
+  background-color: #fff;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+/* ボタンホバー時 */
+.inline-form button:hover {
+  background-color: #ddd;
+}
+
+.product-images {
+  margin-bottom: 10px;
+}

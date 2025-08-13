@@ -29,7 +29,7 @@ class MemberController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(MemberRequest $request)
     {
         // セッションからデータ取得
         $data = $request->session()->get('member_post_data');

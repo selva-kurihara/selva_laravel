@@ -22,9 +22,34 @@ class MemberRequest extends FormRequest
      */
     public function rules(): array
     {
-        // 新規登録時: $memberId = null
-        // 編集時: $memberId = 実際のID
-        $memberId = $this->input('id');
+      // ログイン時
+      if ($this->isMethod('post') && $this->routeIs('login.post')) {
+        return [
+          'email' => ['required', 'email'],
+          'password' => ['required'],
+        ];
+      }
+
+      // パスワード再設定メール送信時
+      if ($this->isMethod('post') && $this->routeIs('password.email')) {
+        return [
+          'email' => ['required', 'email', 'exists:members,email'],
+        ];
+      }
+
+      // パスワード再設定時
+      if ($this->isMethod('post') && $this->routeIs('password.update')) {
+        return [
+          'token' => ['required'],
+          'password' => ['required', 'string', 'confirmed', 'min:8', 'max:20', 'regex:/^[a-zA-Z0-9]+$/'],
+          'password_confirmation' => ['required', 'string', 'min:8', 'max:20', 'regex:/^[a-zA-Z0-9]+$/'],
+          'email' => ['required', 'email', 'exists:members,email'],
+        ];
+      }
+
+      // 新規登録時: $memberId = null
+      // 編集時: $memberId = 実際のID
+      $memberId = $this->input('id');
 
         return [
             'name_sei' => [

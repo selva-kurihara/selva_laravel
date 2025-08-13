@@ -9,7 +9,13 @@
 </head>
 
 <body>
-    @yield('content')
+
+  @hasSection('header')
+    <div class="header">
+        @yield('header')
+    </div>
+  @endif
+  @yield('content')
 </body>
 
 </html>
