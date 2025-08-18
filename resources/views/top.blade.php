@@ -11,6 +11,9 @@
             @endauth
         </div>
         <div class="header-right">
+            <form action="{{ route('products.list') }}" method="GET" class="inline-form">
+                <button type="submit">商品一覧</button>
+            </form>
             @guest
                 {{-- ログアウト時 --}}
                 <form action="{{ route('members.create') }}" method="get" class="inline-form">
@@ -24,6 +27,11 @@
                 <form action="{{ route('products.create') }}" method="get" class="inline-form">
                   <button type="submit">新規商品登録</button>
                 </form>
+
+                <form action="{{ route('members.mypage') }}" method="get" class="inline-form">
+                  <button type="submit">マイページ</button>
+                </form>
+                
                 <form action="{{ route('logout') }}" method="POST" class="inline-form">
                     @csrf
                     <button type="submit">ログアウト</button>

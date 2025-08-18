@@ -24,7 +24,7 @@
         <select name="product_category_id" id="category">
             <option value="">選択してください</option>
             @foreach($categories as $category)
-            <option value="{{ $category->id }}" {{ old('product_category_id') == $category->id ? 'selected' : '' }}>
+            <option value="{{ $category->id }}" {{ (old('product_category_id', request('product_category_id')) == $category->id) ? 'selected' : '' }}>
                 {{ $category->name }}
             </option>
             @endforeach
@@ -110,25 +110,40 @@
     <button type="submit" class="submit-button">確認画面へ</button>
     </form>
 
-    <form action="{{ url('/top') }}" method="GET">
-        <button type="submit" class="submit-button-back">トップに戻る</button>
-    </form>
+    @php
+        $previousUrl = url()->previous();
+        $listUrl = route('products.list');
+        $topUrl  = url('/top');
+    @endphp
+
+    @if(str_starts_with($previousUrl, $listUrl))
+        <form action="{{ $listUrl }}" method="GET">
+            <button type="submit" class="submit-button-back">一覧へ戻る</button>
+        </form>
+    @else
+        <form action="{{ $topUrl }}" method="GET">
+            <button type="submit" class="submit-button-back">トップへ戻る</button>
+        </form>
+    @endif
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function loadSubcategories(selectedSubcategoryId = null) {
-        let categoryId = $('#category').val();
-        $('#subcategory').empty().append('<option value="">選択してください</option>');
+        const categoryId = $('#category').val();
+        const $sub = $('#subcategory');
+
+        $sub.empty().append('<option value="">選択してください</option>');
 
         if (categoryId) {
             $.getJSON(`/subcategories/${categoryId}`, function(data) {
-                $.each(data, function(index, subcategory) {
-                    let selected = (selectedSubcategoryId == subcategory.id) ? 'selected' : '';
-                    $('#subcategory').append(
-                        $('<option>').val(subcategory.id).text(subcategory.name).attr('selected', selected)
-                    );
+                $.each(data, function(_, sc) {
+                    $sub.append(new Option(sc.name, sc.id));
                 });
+
+                if (selectedSubcategoryId) {
+                    $sub.val(String(selectedSubcategoryId));
+                }
             });
         }
     }
@@ -138,8 +153,8 @@
     });
 
     $(document).ready(function() {
-        let oldCategoryId = "{{ old('product_category_id') }}";
-        let oldSubcategoryId = "{{ old('product_subcategory_id') }}";
+        const oldCategoryId = "{{ old('product_category_id', request('product_category_id')) }}";
+        const oldSubcategoryId = "{{ old('product_subcategory_id', request('product_subcategory_id')) }}";
 
         if (oldCategoryId) {
             $('#category').val(oldCategoryId);

@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-
 class ProductController extends Controller
 {
   /**
-   *  商品登録フォーム表示
-   *  @return \Illuminate\Contracts\View\View
+   * 商品登録フォーム表示
    */
   public function create()
   {
@@ -26,9 +24,7 @@ class ProductController extends Controller
   }
 
   /**
-   *  サブカテゴリ取得（AJAX）
-   *  @param int $categoryId
-   *  @return \Illuminate\Http\JsonResponse
+   * サブカテゴリ取得（AJAX）
    */
   public function getSubcategories($categoryId)
   {
@@ -37,49 +33,39 @@ class ProductController extends Controller
   }
 
   /**
-   *  確認画面表示
-   *  @param Request $request
-   *  @return \Illuminate\Contracts\View\View
+   * 確認画面表示
    */
   public function confirm(ProductRequest $request)
   {
-    // 画像パス保持用
     $paths = [];
 
     for ($i = 0; $i < 4; $i++) {
-        if ($request->hasFile("images.$i") && $request->file("images.$i")->isValid()) {
-            // 新規アップロード → 一時保存
-            $paths[$i] = $request->file("images.$i")->store('tmp/products', 'public');
-        } else {
-            // 既存のパスを維持（hiddenから）
-            $paths[$i] = $request->input("imagePaths.$i") ?? '';
-        }
+      if ($request->hasFile("images.$i") && $request->file("images.$i")->isValid()) {
+        $paths[$i] = $request->file("images.$i")->store('tmp/products', 'public');
+      } else {
+        $paths[$i] = $request->input("imagePaths.$i") ?? '';
+      }
     }
 
-    // $request の中に imagePaths を入れ直す
     $data = $request->except('images');
     $data['imagePaths'] = $paths;
 
-    // 確認画面戻り or 初回エラー時用にセッションへ保存
     $request->session()->put('product_post_data', $data);
     $request->session()->put('tmp_image_paths', $paths);
 
-    // カテゴリ名とサブカテゴリ名を取得
-    $categoryName = ProductCategory::find($data['product_category_id'])->name ?? '';
+    $categoryName    = ProductCategory::find($data['product_category_id'])->name ?? '';
     $subcategoryName = ProductSubcategory::find($data['product_subcategory_id'])->name ?? '';
 
     return view('products.confirm', [
-        'data'            => $data,
-        'categoryName'    => $categoryName,
-        'subcategoryName' => $subcategoryName,
-        'imagePaths'      => $paths,
+      'data'            => $data,
+      'categoryName'    => $categoryName,
+      'subcategoryName' => $subcategoryName,
+      'imagePaths'      => $paths,
     ]);
   }
 
   /**
-   *  戻るボタン
-   *  @param Request $request
-   *  @return \Illuminate\Http\RedirectResponse
+   * 戻るボタン処理
    */
   public function back(Request $request)
   {
@@ -88,68 +74,103 @@ class ProductController extends Controller
   }
 
   /**
-   *  商品登録
-   *  @param Request $request
-   *  @return \Illuminate\Http\RedirectResponse
+   * 商品登録処理
    */
-  public function store(ProductRequest $request)
+  public function store(Request $request)
   {
-    // セッションから保存データを取得
     $data = $request->session()->get('product_post_data');
 
     if (!$data) {
       return redirect()->route('products.create')->with('error', 'セッションが切れました。もう一度入力してください。');
     }
 
-    // 会員ID
     $memberId = Auth::id();
-
-    // 画像パス
-    $paths = $data['imagePaths'] ?? [];
+    $paths    = $data['imagePaths'] ?? [];
     for ($i = 0; $i < 4; $i++) {
-        $paths[$i] = $paths[$i] ?? null;
+      $paths[$i] = $paths[$i] ?? null;
     }
 
-    // 保存処理
     DB::transaction(function () use (&$product, $paths, $data, $memberId) {
-        // 画像を temp から本番ディレクトリへ移動
-        $dir = 'products/' . date('Y/m/d') . '/' . Str::random(8);
-        Storage::disk('public')->makeDirectory($dir);
+      $dir = 'products/' . date('Y/m/d') . '/' . Str::random(8);
+      Storage::disk('public')->makeDirectory($dir);
 
-        $final = [null, null, null, null];
-        for ($i = 0; $i < 4; $i++) {
-            $p = $paths[$i];
-            if ($p) {
-                // セキュリティ: 想定外の場所を弾く（任意）
-                if (!str_starts_with($p, 'tmp/products/')) {
-                    throw new \RuntimeException('invalid image path: ' . $p);
-                }
-                $new = $dir . '/' . basename($p);
-                Storage::disk('public')->move($p, $new); // 移動（失敗時は例外に）
-                $final[$i] = $new; // DB には public ディスク相対パスを保存
-            }
+      $final = [null, null, null, null];
+      for ($i = 0; $i < 4; $i++) {
+        $p = $paths[$i];
+        if ($p) {
+          if (!str_starts_with($p, 'tmp/products/')) {
+            throw new \RuntimeException('invalid image path: ' . $p);
+          }
+          $new = $dir . '/' . basename($p);
+          Storage::disk('public')->move($p, $new);
+          $final[$i] = $new;
         }
+      }
 
-        $insertData = [
-            'member_id'               => $memberId,
-            'product_category_id'     => $data['product_category_id'],
-            'product_subcategory_id'  => $data['product_subcategory_id'],
-            'name'                    => $data['name'],
-            'image_1'                 => $final[0],
-            'image_2'                 => $final[1],
-            'image_3'                 => $final[2],
-            'image_4'                 => $final[3],
-            'product_content'         => $data['product_content'],
-        ];
+      $insertData = [
+        'member_id'               => $memberId,
+        'product_category_id'     => $data['product_category_id'],
+        'product_subcategory_id'  => $data['product_subcategory_id'],
+        'name'                    => $data['name'],
+        'image_1'                 => $final[0],
+        'image_2'                 => $final[1],
+        'image_3'                 => $final[2],
+        'image_4'                 => $final[3],
+        'product_content'         => $data['product_content'],
+      ];
 
-        // データベースに保存
-        $product = Product::create($insertData);
+      $product = Product::create($insertData);
     });
 
-    // セッションクリア
     $request->session()->forget('product_post_data');
     $request->session()->forget('tmp_image_paths');
 
     return redirect()->route('top');
+  }
+
+  /**
+   * 商品一覧
+   */
+  public function list(Request $request)
+  {
+    // 検索条件取得
+    $categoryId = $request->input('product_category_id');
+    $subcategoryId = $request->input('product_subcategory_id');
+    $freeWord = $request->input('free_word');
+
+    // クエリ作成
+    $query = Product::with(['category', 'subcategory'])->withAvg('reviews', 'evaluation');
+
+    if (!empty($categoryId)) {
+      $query->where('product_category_id', $categoryId);
+    }
+
+    if (!empty($subcategoryId)) {
+      $query->where('product_subcategory_id', $subcategoryId);
+    }
+
+    if (!empty($freeWord)) {
+      $query->where(function ($q) use ($freeWord) {
+        $q->where('name', 'like', "%{$freeWord}%")
+          ->orWhere('product_content', 'like', "%{$freeWord}%");
+      });
+    }
+
+    // ページネーション
+    $products = $query->orderByDesc('id')->paginate(10)->appends($request->all());
+
+    // カテゴリ一覧
+    $categories = ProductCategory::all();
+
+    return view('products.list', compact('products', 'categories'));
+  }
+
+  /**
+   * 商品詳細
+   */
+  public function detail(Product $product)
+  {
+    $product->loadAvg('reviews', 'evaluation');
+    return view('products.detail', compact('product'));
   }
 }

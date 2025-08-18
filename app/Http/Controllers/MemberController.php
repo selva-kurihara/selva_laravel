@@ -7,6 +7,7 @@ use App\Http\Requests\MemberRequest;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 class MemberController extends Controller
 {
@@ -29,7 +30,7 @@ class MemberController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(MemberRequest $request)
+    public function store(Request $request)
     {
         // セッションからデータ取得
         $data = $request->session()->get('member_post_data');
@@ -109,4 +110,37 @@ class MemberController extends Controller
 
         return redirect()->route('members.create')->withInput($data);
     }
+
+    public function mypage()
+    {
+      $member = Auth::user(); // ログインユーザー情報を取得
+
+    if (!$member) {
+      return redirect()->route('login'); // ログインしていなければログインページへ
+    }
+
+      return view('members.mypage', compact('member'));
+    }
+
+  // 退会ページ表示
+  public function withdraw()
+  {
+    $member = Auth::user();
+    return view('members.withdraw', compact('member'));
+  }
+
+  // 退会処理（ソフトデリート）
+  public function withdrawProcess(Request $request)
+  {
+    $member = Auth::user();
+
+    // ソフトデリート
+    $member->delete();
+
+    // ログアウト
+    Auth::logout();
+
+    // トップ画面へリダイレクト
+    return redirect()->route('top');
+  }
 }
