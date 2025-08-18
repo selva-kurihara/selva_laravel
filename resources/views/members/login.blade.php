@@ -9,12 +9,12 @@
             @csrf
 
             <div class="form-row">
-              <label>メールアドレス（ID）</label>
+              <label style="min-width: 140px">メールアドレス（ID）</label>
               <input type="email" name="email" value="{{ old('email') }}">
             </div>
             
             <div class="form-row">
-              <label>パスワード</label>
+              <label style="min-width: 140px">パスワード</label>
               <input type="password" name="password">
             </div>
             @error('password')
