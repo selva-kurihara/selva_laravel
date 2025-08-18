@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Member extends Authenticatable
 {
@@ -45,4 +46,8 @@ class Member extends Authenticatable
         'password' => 'hashed',
         'gender' => 'integer',
     ];
+
+    use HasFactory, SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 }

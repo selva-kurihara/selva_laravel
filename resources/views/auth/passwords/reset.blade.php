@@ -12,7 +12,7 @@
             <input type="hidden" name="token" value="{{ $token }}">
 
             <div class="form-row">
-                <label>新しいパスワード</label>
+                <label style="min-width: 170px">新しいパスワード</label>
                 <input type="password" name="password">
             </div>
             @error('password')
@@ -20,7 +20,7 @@
             @enderror
 
             <div class="form-row">
-                <label>新しいパスワード（確認）</label>
+                <label style="min-width: 170px">新しいパスワード（確認）</label>
                 <input type="password" name="password_confirmation">
             </div>
             @error('password_confirmation')

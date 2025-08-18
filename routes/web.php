@@ -5,7 +5,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,13 +25,27 @@ Route::post('/password/email', [PasswordResetController::class, 'sendResetEmail'
 Route::get('password/reset/{email}/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [PasswordResetController::class, 'reset'])->name('password.update');
 
+Route::get('/products/list', [ProductController::class, 'list'])->name('products.list');
+Route::get('/products/detail/{product}', [ProductController::class, 'detail'])->name('products.detail');
+Route::get('/subcategories/{categoryId}', [ProductController::class, 'getSubcategories']);
+
 // ログイン時のみアクセス可能
 Route::middleware('auth')->group(function () {
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products/confirm', [ProductController::class, 'confirm'])->name('products.confirm');
-    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-    Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
-    Route::get('/subcategories/{categoryId}', [ProductController::class, 'getSubcategories']);
-    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-    Route::post('/products/back', [ProductController::class, 'back'])->name('products.back');
-});
+  // 商品登録ページ（フォーム表示）
+  Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+
+  // 商品登録処理
+  Route::post('products', [ProductController::class, 'store'])->name('products.store');
+
+  // レビュー関連
+  Route::get('products/{product}/reviews/create', [ReviewController::class, 'create'])->name('products.reviews.create');
+  Route::post('products/{product}/reviews/store', [ReviewController::class, 'store'])->name('products.reviews.store');
+  Route::post('products/{product}/reviews/confirm', [ReviewController::class, 'confirm'])->name('products.reviews.confirm');
+  Route::post('products/{product}/reviews/back', [ReviewController::class, 'back'])->name('products.reviews.back');
+  Route::get('products/{product}/reviews/index', [ReviewController::class, 'index'])->name('products.reviews.index');
+
+  Route::get('/mypage', [MemberController::class, 'mypage'])->name('members.mypage');
+
+  Route::get('/withdraw', [MemberController::class, 'withdraw'])->name('members.withdraw');
+  Route::post('/withdraw', [MemberController::class, 'withdrawProcess'])->name('members.withdraw.process');
+  });
