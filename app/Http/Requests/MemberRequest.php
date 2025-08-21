@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class MemberRequest extends FormRequest
 {
@@ -30,26 +31,40 @@ class MemberRequest extends FormRequest
         ];
       }
 
-      // パスワード再設定メール送信時
+      // パスワード再設定時メール送信時（未ログイン時）
       if ($this->isMethod('post') && $this->routeIs('password.email')) {
         return [
           'email' => ['required', 'email', 'exists:members,email'],
         ];
       }
 
-      // パスワード再設定時
-      if ($this->isMethod('post') && $this->routeIs('password.update')) {
+      // メールアドレス変更時メール送信時（ログイン時）
+      if ($this->isMethod('post') && $this->routeIs('members.email.update')) {
         return [
-          'token' => ['required'],
+          'email' => ['required', 'string', 'email', 'max:200', Rule::unique('members', 'email')->whereNull('deleted_at'),],
+        ];
+      }
+
+      // パスワード再設定時（未ログイン時）とパスワード変更時（ログイン時）
+      if ($this->isMethod('post') && ($this->routeIs('password.update') || $this->routeIs('members.password.update'))) {
+        return [
           'password' => ['required', 'string', 'confirmed', 'min:8', 'max:20', 'regex:/^[a-zA-Z0-9]+$/'],
           'password_confirmation' => ['required', 'string', 'min:8', 'max:20', 'regex:/^[a-zA-Z0-9]+$/'],
-          'email' => ['required', 'email', 'exists:members,email'],
+        ];
+      }
+
+      // 認証コード入力時（ログイン時）
+      if ($this->isMethod('post') && $this->routeIs('members.email.verify')) {
+        return [
+          'auth_code' => ['required', 'string', 'max:6', Rule::exists('members', 'auth_code')->where('id', Auth::id()),],
         ];
       }
 
       // 新規登録時: $memberId = null
       // 編集時: $memberId = 実際のID
       $memberId = $this->input('id');
+
+      if (is_null($memberId)) {
 
         return [
             'name_sei' => [
@@ -94,6 +109,29 @@ class MemberRequest extends FormRequest
                 Rule::unique('members')->ignore($memberId)->whereNull('deleted_at'),
             ],
         ];
+      }else{
+        return [
+          'name_sei' => [
+            'required',
+            'string',
+            'max:20'
+          ],
+          'name_mei' => [
+            'required',
+            'string',
+            'max:20'
+          ],
+          'nickname' => [
+            'required',
+            'string',
+            'max:10'
+          ],
+          'gender' => [
+            'required',
+            'in:1,2'
+          ],
+        ];
+      }
     }
 
     /**

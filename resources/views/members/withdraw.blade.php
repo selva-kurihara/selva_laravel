@@ -4,6 +4,7 @@
 
 @section('header')
 <div class="header-container">
+    <div class="header-left"></div>
     <div class="header-right">
         <form action="{{ route('top') }}" method="get" class="inline-form">
             <button type="submit">トップに戻る</button>
@@ -17,21 +18,16 @@
 @endsection
 
 @section('content')
-<div class="container">
+<div class="form-wrapper">
     <a>退会します。よろしいですか？</a>
 
-  <form method="GET" action="{{ route('members.mypage') }}" style="margin-top:10px;">
-      <button type="submit" class="submit-button-back">マイページに戻る</button>
-  </form>
+    <form method="GET" action="{{ route('members.mypage') }}" style="margin-top:10px;">
+        <button type="submit" class="submit-button-back">マイページに戻る</button>
+    </form>
 
-<form method="POST" action="{{ route('members.withdraw.process') }}">
-    @csrf
-    <button type="submit" class="submit-button">退会する</button>
-</form>
-
-
-
-
-    
+    <form method="POST" action="{{ route('members.withdraw.process') }}">
+        @csrf
+        <button type="submit" class="submit-button">退会する</button>
+    </form>
 </div>
 @endsection

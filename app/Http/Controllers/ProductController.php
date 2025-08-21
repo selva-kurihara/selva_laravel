@@ -125,7 +125,7 @@ class ProductController extends Controller
     $request->session()->forget('product_post_data');
     $request->session()->forget('tmp_image_paths');
 
-    return redirect()->route('top');
+    return redirect()->route('products.list');
   }
 
   /**

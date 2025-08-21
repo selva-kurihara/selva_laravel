@@ -75,14 +75,20 @@
 
             {{-- 総合評価 --}}
             @php
-            $evaluations = ceil($product->reviews_avg_evaluation ?? 0); // nullの場合は0
+                $evaluations = $product->reviews_avg_evaluation;
             @endphp
+
             <div class="product-evaluations">
-            @for ($i = 0; $i < $evaluations; $i++)
-                ★
-            @endfor
-            {{ $evaluations }}
+                @if (is_null($evaluations))
+                    <span class="no-evaluation">未評価</span>
+                @else
+                    @for ($i = 0; $i < ceil($evaluations); $i++)
+                        ★
+                    @endfor
+                    {{ ceil($evaluations) }}
+                @endif
             </div>
+
             <div class="product-actions">
                 <a href="{{ route('products.detail', ['product' => $product->id, 'page' => request()->get('page', 1)]) }}" class="detail-button">詳細</a>
             </div>
@@ -95,31 +101,39 @@
 
     {{-- カスタムページネーション --}}
     @php
-    $totalPages = $products->lastPage();
-    $currentPage = $products->currentPage();
-    $startPage = max($currentPage - 1, 1); // 現在ページの前のページ
-    $endPage = min($startPage + 2, $totalPages); // 3ページずつ表示
+        $window = 3; // 常に出したいページ数
+        $totalPages  = $products->lastPage();
+        $currentPage = $products->currentPage();
+
+        // 基本は current の1つ前から
+        $startPage = $currentPage - 1;
+
+        // 端の調整：開始は [1, totalPages - (window-1)] に収める
+        $startPage = max(min($startPage, $totalPages - ($window - 1)), 1);
+
+        // 終了は開始＋(window-1) ただし totalPages を超えない
+        $endPage = min($startPage + ($window - 1), $totalPages);
     @endphp
 
     <div class="pagination flex items-center gap-2">
-    {{-- 前ページ --}}
-    @if ($products->onFirstPage() === false)
-        <a href="{{ $products->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
-    @endif
+        {{-- 前ページ --}}
+        @unless ($products->onFirstPage())
+            <a href="{{ $products->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
+        @endunless
 
-    {{-- ページ番号 --}}
-    @for ($i = $startPage; $i <= $endPage; $i++)
-        @if ($i == $currentPage)
-            <span class="px-2 py-1 border rounded bg-purple-600 text-white text-sm">{{ $i }}</span>
-        @else
-            <a href="{{ $products->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
+        {{-- ページ番号 --}}
+        @for ($i = $startPage; $i <= $endPage; $i++)
+            @if ($i == $currentPage)
+                <span class="px-2 py-1 border rounded bg-purple-600 text-white text-sm">{{ $i }}</span>
+            @else
+                <a href="{{ $products->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
+            @endif
+        @endfor
+
+        {{-- 次ページ --}}
+        @if ($products->hasMorePages())
+            <a href="{{ $products->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
         @endif
-    @endfor
-
-    {{-- 次ページ --}}
-    @if ($products->hasMorePages())
-        <a href="{{ $products->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
-    @endif
     </div>
 
 </div>

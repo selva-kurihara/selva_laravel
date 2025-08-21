@@ -6,6 +6,7 @@
 <div class="form-wrapper">
     <h1>商品登録確認画面</h1>
 
+    <div>
         <div class="form-row">
             <label>商品名</label>
             {{ $data['name'] ?? '' }}
@@ -47,16 +48,17 @@
             {{ $data['product_content'] ?? '' }}
         </div>
 
-    <form action="{{ route('products.store') }}" method="POST">
-        @csrf
-        <div>
-            <button type="submit" class="submit-button">商品を登録する</button>
-        </div>
-    </form>
+        <form action="{{ route('products.store') }}" method="POST">
+            @csrf
+            <div>
+                <button type="submit" class="submit-button">商品を登録する</button>
+            </div>
+        </form>
 
-    <form action="{{ route('products.back') }}" method="POST">
-        @csrf
-        <button type="submit" class="submit-button-back">前に戻る</button>
-    </form>
+        <form action="{{ route('products.back') }}" method="POST">
+            @csrf
+            <button type="submit" class="submit-button-back">前に戻る</button>
+        </form>
+    </div>
 </div>
 @endsection

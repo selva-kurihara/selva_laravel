@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <h2>{{ $member->name_sei }} {{ $member->name_mei }} 様</h2>
+    <h1>{{ $member->name_sei }} {{ $member->name_mei }} 様</h1>
 
     <p>この度は会員登録いただき、誠にありがとうございます。</p>
 

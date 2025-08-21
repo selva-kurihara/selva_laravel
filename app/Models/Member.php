@@ -50,4 +50,14 @@ class Member extends Authenticatable
     use HasFactory, SoftDeletes;
 
     protected $dates = ['deleted_at'];
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

@@ -99,7 +99,7 @@
 
     <div class="form-row">
         <label>商品説明</label>
-        <input type="text" name="product_content" value="{{ old('product_content') }}">
+        <textarea name="product_content" rows="4">{{ old('product_content') }}</textarea>
     </div>
     @error('product_content')
         <div class="required">

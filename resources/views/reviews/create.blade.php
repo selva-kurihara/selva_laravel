@@ -18,23 +18,48 @@
 
 @section('content')
 <div class="form-wrapper">
+    <div>
+        {{-- 上部：商品情報 --}}
+        <div class="product-info">
+            <div class="product-header">
+                <h1>{{ $product->name }}</h1>
 
-    {{-- 上部：商品情報 --}}
-    <div class="product-info">
-        <h2>{{ $product->name }}</h2>
+                @php
+                    $evaluations = $product->reviews_avg_evaluation;
+                @endphp
+                <div class="product-rating">
+                    <span>総合評価
+                    @if (is_null($evaluations))
+                        <span class="no-evaluation" style="margin-left: 10px;">未評価</span>
+                    @else
+                        @for ($i = 0; $i < ceil($evaluations); $i++)
+                            ★
+                        @endfor
+                        {{ ceil($evaluations) }}
+                    @endif
+                    </span>
+                </div>
+            </div>
 
-        <div class="product-images">
-            @for ($i = 1; $i <= 4; $i++)
-                @php $img = $product->{'image_' . $i}; @endphp
-                @if($img)
-                    <img src="{{ asset('storage/' . $img) }}" alt="商品画像" style="max-width:150px; max-height:150px; margin-right:10px;">
-                @endif
-            @endfor
+            <div class="product-images">
+                @for ($i = 1; $i <= 4; $i++)
+                    @php $img = $product->{'image_' . $i}; @endphp
+                    @if($img)
+                        <img src="{{ asset('storage/' . $img) }}" alt="商品画像" style="max-width:150px; max-height:150px; margin-right:10px;">
+                    @endif
+                @endfor
+            </div>
         </div>
-    </div>
 
-    {{-- 下部：レビュー入力フォーム --}}
-    <form action="{{ route('products.reviews.confirm', ['product' => $product->id]) }}" method="POST">
+        {{-- 下部：レビュー入力フォーム --}}
+        {{-- Blade --}}
+
+        <form 
+        action="{{ isset($review) 
+        ? route('products.reviews.edit.confirm', ['product' => $product->id, 'review' => $review->id]) 
+        : route('products.reviews.confirm', ['product' => $product->id]) }}" 
+        method="POST"
+        >
         @csrf
 
         <div class="form-row">
@@ -42,7 +67,10 @@
             <select name="evaluation">
                 <option value="">選択してください</option>
                 @for ($i = 1; $i <= 5; $i++)
-                    <option value="{{ $i }}" {{ old('evaluation') == $i ? 'selected' : '' }}>{{ $i }} ★</option>
+                    <option value="{{ $i }}" 
+                        {{ old('evaluation', $review->evaluation ?? '') == $i ? 'selected' : '' }}>
+                        {{ $i }} ★
+                    </option>
                 @endfor
             </select>
         </div>
@@ -52,17 +80,21 @@
 
         <div class="form-row">
             <label>商品コメント</label>
-            <textarea name="comment" rows="4">{{ old('comment') }}</textarea>
+            <textarea name="comment" rows="4">{{ old('comment', $review->comment ?? '') }}</textarea>
         </div>
         @error('comment')
             <div class="required">※{{ $message }}</div>
         @enderror
 
-        <button type="submit" class="submit-button">商品レビュー登録確認</button>
-    </form>
+        <button type="submit" class="submit-button">
+            {{ isset($review) ? '商品レビュー更新' : '商品レビュー登録確認' }}
+        </button>
+        </form>
 
-    <form action="{{ route('products.detail', ['product' => $product->id]) }}" method="GET">
-        <button type="submit" class="submit-button-back">商品詳細に戻る</button>
-    </form>
+
+        <form action="{{ route('products.detail', ['product' => $product->id]) }}" method="GET">
+            <button type="submit" class="submit-button-back">商品詳細に戻る</button>
+        </form>
+    </div>
 </div>
 @endsection
