@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-      Schema::create('product_categories',function (Blueprint $table) {
-        $table->id()->comment('カテゴリID');
-        $table->string('name', 255)->comment('カテゴリ名');
-        $table->timestamps(); // created_at, updated_at
-        $table->softDeletes(); // deleted_at  
-      });
+      if (!Schema::hasTable('product_categories')) {
+        Schema::create('product_categories',function (Blueprint $table) {
+          $table->id()->comment('カテゴリID');
+          $table->string('name', 255)->comment('カテゴリ名');
+          $table->timestamps(); // created_at, updated_at
+          $table->softDeletes(); // deleted_at  
+        });
+      }
     }
     /**
      * Reverse the migrations.

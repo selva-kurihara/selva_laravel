@@ -1,0 +1,181 @@
+body {
+    font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background-color: #dcf0f5;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.form-wrapper {
+    padding: 30px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+label {
+    min-width: 120px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 325px;
+}
+
+.submit-button {
+    width: 230px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 0;
+    font-weight: bold;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 左端と右端に配置 */
+  padding: 8px 16px;
+  min-height: 56px;
+  border-bottom: 1px solid #eee;
+  background: #9aa6ad;
+}
+
+.search-button {
+    background: linear-gradient(90deg, #81ceec, #428de4);
+    color: white;
+    padding: 5px 40px;
+    border: none;
+    border-radius: 25px; /* 丸み強めでやわらかい印象 */
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 30px;
+    font-weight: bold;
+    transition: transform 0.1s ease-in-out, opacity 0.2s;
+}
+
+.member-list {
+    margin-top: 30px;
+    width: 50%;
+}
+
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.member-table th {
+    background-color: #9ec9e6be;
+    border: 1px solid #929191;
+    padding: 8px;
+    text-align: left;
+}
+
+.member-table td {
+    border: 1px solid #929191;
+    padding: 8px;
+    text-align: left;
+}
+
+.inline-form button {
+  background-color: #fff;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.member-table th a {
+    text-decoration: none;  /* 下線を消す */
+    color: inherit;         /* 親要素の文字色を継承（青リンクをやめる） */
+}
+
+.member-table th a:hover {
+    text-decoration: underline; /* ホバーでだけ下線表示（任意） */
+    color: #007bff;             /* 任意の色に変える */
+}
+
+.create-button-list {
+    width: 150px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 30px;
+    font-weight: bold;
+    right: 180px;
+    position: relative;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 325px;
+}
+
+.name-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-inputs input {
+    width: 120px;
+}
+
+.name-inputs span {
+    font-size: 14px;
+}
+
+.submit-button-back {
+    width: 230px;
+    background-color: white;
+    color: #007bff;
+    padding: 12px 40px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 30px;
+}

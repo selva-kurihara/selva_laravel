@@ -19,6 +19,10 @@ class CustomAuthenticate extends Middleware
             if ($request->routeIs('products.create')) {
                 return route('errors.unauthorized'); // ↓で作るルート名
             }
+            // 管理者ログイン時は管理者ログイン画面へ
+            if ($request->is('admin/*')) {
+                return route('admin.login');
+            }
             // それ以外は従来どおりログインへ
             return route('login');
         }

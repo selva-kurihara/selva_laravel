@@ -16,10 +16,11 @@ class DatabaseSeeder extends Seeder
     
     $this->call(ProductCategoriesTableSeeder::class);
     $this->call(ProductSubcategoriesTableSeeder::class);
+    $this->call(AdministerSeeder::class);
 
-    User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+    // User::factory()->create([
+    //         'name' => 'Test User',
+    //         'email' => 'test@example.com',
+    //     ]);
     }
 }

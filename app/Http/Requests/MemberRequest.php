@@ -110,7 +110,7 @@ class MemberRequest extends FormRequest
             ],
         ];
       }else{
-        return [
+        $rules = [
           'name_sei' => [
             'required',
             'string',
@@ -130,7 +130,34 @@ class MemberRequest extends FormRequest
             'required',
             'in:1,2'
           ],
+          'email' => [
+            'required',
+            'string',
+            'email',
+            'max:200',
+            Rule::unique('members')->ignore($memberId)->whereNull('deleted_at'),
+          ],
         ];
+
+        // パスワードが入力された場合のみバリデーションを追加
+        if ($this->filled('password')) {
+          $rules['password'] = [
+            'string',
+            'min:8',
+            'max:20',
+            'regex:/^[a-zA-Z0-9]+$/',
+            'confirmed'
+          ];
+          $rules['password_confirmation'] = [
+            'required_with:password',
+            'string',
+            'min:8',
+            'max:20',
+            'regex:/^[a-zA-Z0-9]+$/'
+          ];
+        }
+
+        return $rules;
       }
     }
 

@@ -8,15 +8,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\EmailController;
-
+use App\Http\Controllers\AdministerController;
+use App\Http\Controllers\Auth\AdminLoginController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('members/confirm', [MemberController::class, 'confirm'])->name('members.confirm');
 Route::resource('members', MemberController::class);
-
+Route::post('members/confirm', [MemberController::class, 'confirm'])->name('members.confirm');
 Route::post('members/back', [MemberController::class, 'back'])->name('members.back');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -70,3 +70,25 @@ Route::middleware('auth')->group(function () {
 
 // エラー画面
 Route::view('/unauthorized', 'errors.unauthorized')->name('errors.unauthorized');
+
+// 管理者画面用
+Route::prefix('admin')->name('admin.')->group(function () {
+  // ログアウト時
+  Route::middleware('guest:admin')->group(function () {
+        Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+        Route::post('login', [AdminLoginController::class, 'login'])->name('login.post');
+        Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
+    });
+
+  // ログイン時
+  Route::middleware('auth:admin')->group(function () {
+      Route::get('top', [AdminLoginController::class, 'top'])->name('top');
+      Route::get('members', [AdministerController::class, 'membersIndex'])->name('members.index');
+      Route::get('members/create', [AdministerController::class, 'create'])->name('members.create');
+      Route::post('members/confirm', [AdministerController::class, 'confirm'])->name('members.confirm');
+      Route::post('members/back', [AdministerController::class, 'back'])->name('members.back');
+      Route::post('members/store', [AdministerController::class, 'store'])->name('members.store');
+      Route::get('members/{member}/edit', [AdministerController::class, 'edit'])->name('members.edit');
+      Route::put('members/{member}', [AdministerController::class, 'update'])->name('members.update');
+  });
+});

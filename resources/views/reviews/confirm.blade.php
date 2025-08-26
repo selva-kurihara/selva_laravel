@@ -95,19 +95,20 @@
                 @endif
             </button>
         </form>
-
   
-        <form action="{{ (isset($isDelete) && $isDelete) 
-        ? route('products.reviews.management', ['product' => $product->id])
-        : (isset($review) 
-            ? route('reviews.edit', ['review' => $review->id]) 
-            : route('products.reviews.back', ['product' => $product->id])) }}" 
-              method="POST">
-            @csrf
-            <button type="submit" class="submit-button-back">前に戻る</button>
-        </form>
+        @if (isset($isDelete) && $isDelete)
+            {{-- 削除後は管理画面に戻るだけなので GET --}}
+            <form action="{{ route('products.reviews.management', ['product' => $product->id]) }}" method="GET">
+                <button type="submit" class="submit-button-back">前に戻る</button>
+            </form>
+        @else
+            {{-- 通常は back() に飛ばしてセッションから入力値を復元するので POST --}}
+            <form action="{{ route('products.reviews.back', ['product' => $product->id]) }}" method="POST">
+                @csrf
+                <button type="submit" class="submit-button-back">前に戻る</button>
+            </form>
+        @endif
 
-    
     </div>
 </div>
 @endsection

@@ -43,17 +43,22 @@
 
         <div class="product-name">{{ $product?->name }}</div>
 
-        <div class="rating-row" aria-label="評価 {{ $evaluation }}">
+        @php
+            // 念のため整数キャスト
+            $evaluation = (int) ($review->evaluation ?? 0);
+        @endphp
+
+        <div class="rating-row">
           <span class="stars">
-            @for ($i = 1; $i <= 5; $i++)
-              <span class="star{{ $i <= $evaluation ? ' on' : '' }}">★</span>
+            @for ($i = 1; $i <= $evaluation; $i++)
+              ★
             @endfor
           </span>
           <span class="rating-num">{{ $evaluation }}</span>
         </div>
 
         <div class="review-comment">
-          {{ $review->comment }}
+            {{ mb_strimwidth($review->comment, 0, 32, '…', 'UTF-8') }}
         </div>
 
         <div class="review-actions">

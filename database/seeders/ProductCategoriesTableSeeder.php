@@ -13,7 +13,7 @@ class ProductCategoriesTableSeeder extends Seeder
      */
     public function run(): void
     {
-      DB::table('product_categories')->insert([
+      DB::table('product_categories')->insertOrIgnore([
         ['id' => 1, 'name' => 'インテリア', 'created_at' => now(), 'updated_at' => now()],
         ['id' => 2, 'name' => '家電', 'created_at' => now(), 'updated_at' => now()],
         ['id' => 3, 'name' => 'ファッション', 'created_at' => now(), 'updated_at' => now()],

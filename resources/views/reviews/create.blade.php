@@ -1,12 +1,22 @@
 @extends('app')
 
-@section('title', '商品レビュー登録')
+@section('title')
+    @if(isset($review))
+        商品レビュー更新
+    @else
+        商品レビュー登録
+    @endif
+@endsection
 
 @section('header')
 <div class="header-container">
     <div class="header-left"></div>
     <div class="header-title">
-        商品レビュー登録
+        @if(isset($review))
+            商品レビュー更新
+        @else
+            商品レビュー登録
+        @endif
     </div>
     <div class="header-right">    
         <form action="{{ url('/top') }}" method="get" class="inline-form">
@@ -92,8 +102,16 @@
         </form>
 
 
-        <form action="{{ route('products.detail', ['product' => $product->id]) }}" method="GET">
-            <button type="submit" class="submit-button-back">商品詳細に戻る</button>
+        <form action="{{ isset($review) 
+        ? route('products.reviews.management', ['product' => $product->id]) 
+        : route('products.detail', ['product' => $product->id]) }}" method="GET">
+            <button type="submit" class="submit-button-back">
+                @if(isset($review))
+                    レビュー管理に戻る
+                @else
+                    商品詳細に戻る
+                @endif
+            </button>
         </form>
     </div>
 </div>

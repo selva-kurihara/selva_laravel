@@ -49,9 +49,19 @@ class ReviewController extends Controller
    */
   public function back(Request $request, Product $product)
   {
-    $data = $request->session()->get('review_post_data', []);
+    $postData = $request->session()->get('review_post_data', []);
+    $editData = $request->session()->get('review_edit_data', []);
 
-    return redirect()->route('products.reviews.create', ['product' => $product->id])->withInput($data);
+    if (!empty($editData)) {
+        // 編集の場合
+        $reviewId = $request->session()->get('review_id');
+        return redirect()
+            ->route('reviews.edit', ['review' => $reviewId])
+            ->withInput($editData);
+    }
+
+    // 新規の場合
+    return redirect()->route('products.reviews.create', ['product' => $product->id])->withInput($postData);
   }
 
   /**
@@ -112,6 +122,7 @@ class ReviewController extends Controller
     $review = Review::findOrFail($id);
     $product = $review->product; // リレーション経由で商品を取得
 
+    $product->loadAvg('reviews', 'evaluation');
     return view('reviews.create', compact('review', 'product'));
   }
 
@@ -122,6 +133,10 @@ class ReviewController extends Controller
     $data = $request->validated();
     // セッションに保存（確認画面 → update で利用する）
     $request->session()->put('review_edit_data', $data);
+    $request->session()->put('review_id', $reviewId);
+
+    $product = $review->product;
+    $product->loadAvg('reviews', 'evaluation');
 
     return view('reviews.confirm', [
       'product' => $review->product,
@@ -158,7 +173,7 @@ class ReviewController extends Controller
   {
     $review = Review::findOrFail($reviewId);
     $product = $review->product;
-
+    $product->loadAvg('reviews', 'evaluation');
     $data = [
       'evaluation' => $review->evaluation,
       'comment' => $review->comment,
