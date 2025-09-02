@@ -1,10 +1,10 @@
 @extends('admin')
 
-@section('title', '商品一覧')
+@section('title', 'レビュー一覧')
 
 @section('header')
     <div class="header-container">
-        <div class="header-left">商品一覧</div>
+        <div class="header-left">レビュー一覧</div>
         <div class="header-right">
             <form action="{{ route('admin.top') }}" method="GET" class="inline-form">
                 <button type="submit">トップへ戻る</button>
@@ -14,11 +14,11 @@
 @endsection
 
 @section('content')
-<form action="{{ route('admin.products.create') }}" method="GET">
-    <button type="submit" class="create-button-list">商品登録</button>
+<form action="{{ route('admin.reviews.create') }}" method="GET">
+    <button type="submit" class="create-button-list">レビュー登録</button>
 </form>
 <div class="form-wrapper">
-    <form method="GET" action="{{ route('admin.products.index') }}">
+    <form method="GET" action="{{ route('admin.reviews.index') }}">
         <div class="form-row">
             <label>ID</label>
             <input type="text" name="id" value="{{ request('id') }}">
@@ -48,14 +48,16 @@
             <thead>
                 <tr>
                     <th>
-                        <a href="{{ route('admin.products.index',
+                        <a href="{{ route('admin.reviews.index',
                             ['sort' => 'id', 'direction' => $nextDirId] + request()->except('page')) }}">
                             ID {{ ($currentSort === 'id' && $currentDir === 'asc') ? '▲' : '▼' }}
                         </a>
                     </th>
-                    <th>商品名</th>
+                    <th>商品ID</th>
+                    <th>評価</th>
+                    <th>評価コメント</th>
                     <th>
-                        <a href="{{ route('admin.products.index',
+                        <a href="{{ route('admin.reviews.index',
                             ['sort' => 'created_at', 'direction' => $nextDirCreated] + request()->except('page')) }}">
                             登録日時 {{ ($currentSort === 'created_at' && $currentDir === 'asc') ? '▲' : '▼' }}
                         </a>
@@ -65,13 +67,15 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $product)
+                @foreach($reviews as $review)
                     <tr>
-                        <td>{{ $product->id }}</td>
-                        <td><a href="{{ route('admin.products.show', $product->id) }}">{{ $product->name }}</a></td>
-                        <td>{{ $product->created_at->format('Y/m/d') }}</td>
-                        <td><a href="{{ route('admin.products.edit', $product->id) }}">編集</a></td>
-                        <td><a href="{{ route('admin.products.show', $product->id) }}">詳細</a></td>
+                        <td>{{ $review->id }}</td>
+                        <td><a href="{{ route('admin.reviews.show', $review->id) }}">{{ $review->product_id }}</a></td>
+                        <td>{{ $review->evaluation }}</td>
+                        <td>{{ $review->comment }}</td>
+                        <td>{{ $review->created_at->format('Y/m/d') }}</td>
+                        <td><a href="{{ route('admin.reviews.edit', $review->id) }}">編集</a></td>
+                        <td><a href="{{ route('admin.reviews.show', $review->id) }}">詳細</a></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -81,8 +85,8 @@
     {{-- カスタムページネーション --}}
     @php
         $window = 3;
-        $totalPages  = $products->lastPage();
-        $currentPage = $products->currentPage();
+        $totalPages  = $reviews->lastPage();
+        $currentPage = $reviews->currentPage();
 
         // 基本は current の1つ前から
         $startPage = $currentPage - 1;
@@ -96,7 +100,7 @@
 
     <div class="pagination flex items-center gap-2">
         {{-- 前ページ --}}
-        @unless ($products->onFirstPage())
+        @unless ($reviews->onFirstPage())
             <a href="{{ $products->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
         @endunless
 
@@ -105,13 +109,13 @@
             @if ($i == $currentPage)
                 <span class="px-2 py-1 border rounded bg-purple-600 text-white text-sm">{{ $i }}</span>
             @else
-                <a href="{{ $products->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
+                <a href="{{ $reviews->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
             @endif
         @endfor
 
         {{-- 次ページ --}}
-        @if ($products->hasMorePages())
-            <a href="{{ $products->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
+        @if ($reviews->hasMorePages())
+            <a href="{{ $reviews->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
         @endif
     </div>
 

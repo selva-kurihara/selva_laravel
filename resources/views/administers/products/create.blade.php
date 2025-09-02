@@ -24,6 +24,17 @@
     @endif
 
     <div class="form-row">
+        <label>商品ID</label>
+        <div class="name-inputs">
+            @if(isset($product->id))
+                <span>{{ $product->id }}</span>
+            @else
+                <span>登録後に自動採番</span>
+            @endif
+        </div>
+    </div>
+
+    <div class="form-row">
         <label>商品名</label>
         <input type="text" name="name" value="{{ old('name', $product->name ?? '') }}">
     </div>
@@ -74,41 +85,52 @@
             @php
                 $old      = old('imagePaths', []);
                 $session  = session('tmp_image_paths', []);
-                $oldImagePaths = [];
+                $initial  = $initialImagePaths ?? [];
+                $imagePaths = [];
 
                 for ($i = 0; $i < 4; $i++) {
                     $v = $old[$i] ?? null;
-                    if (empty($v)) {
-                        $v = $session[$i] ?? '';
+                    if (empty($v)) $v = $session[$i] ?? null;
+                    if (empty($v)) $v = $initial[$i] ?? '';
+                    $imagePaths[$i] = $v;
+                }
+
+                function buildImgSrc($path) {
+                    if (!$path) return '';
+                    if (preg_match('#^https?://|^/storage/#', $path)) {
+                        return $path;
                     }
-                    $oldImagePaths[$i] = $v;
+                    return \Illuminate\Support\Facades\Storage::url($path);
                 }
             @endphp
 
             @for ($i = 0; $i < 4; $i++)
-                @php $oldPath = $oldImagePaths[$i] ?? ''; @endphp
+                @php
+                    $path = $imagePaths[$i] ?? '';
+                    $src  = $path ? buildImgSrc($path) : '';
+                @endphp
 
                 <div class="image-slot">
                     <input
-                    type="file"
-                    name="images[{{ $i }}]"
-                    accept="image/*"
-                    id="image{{ $i }}"
-                    style="display:none;"
-                    onchange="previewImage(event, {{ $i }})"
+                        type="file"
+                        name="images[{{ $i }}]"
+                        accept="image/*"
+                        id="image{{ $i }}"
+                        style="display:none;"
+                        onchange="previewImage(event, {{ $i }})"
                     >
 
                     <img
-                    id="preview{{ $i }}"
-                    src="{{ $oldPath ? Storage::url($oldPath) : '' }}"
-                    alt="プレビュー"
-                    style="{{ $oldPath ? '' : 'display:none;' }} max-width:150px; max-height:150px; margin-right:10px;"
+                        id="preview{{ $i }}"
+                        src="{{ $src }}"
+                        alt="プレビュー"
+                        style="{{ $src ? '' : 'display:none;' }} max-width:150px; max-height:150px; margin-right:10px;"
                     >
 
-                    <input type="hidden" name="imagePaths[{{ $i }}]" value="{{ $oldPath }}">
+                    <input type="hidden" name="imagePaths[{{ $i }}]" value="{{ $path }}">
 
                     <button type="button" onclick="document.getElementById('image{{ $i }}').click()">
-                    アップロード
+                        アップロード
                     </button>
                 </div>
             @endfor

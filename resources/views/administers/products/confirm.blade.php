@@ -2,11 +2,27 @@
 
 @section('title', '商品登録確認')
 
+@section('header')
+    <div class="header-container">
+        <div class="header-left">{{ isset($data['id']) ? '商品編集確認' : '商品登録確認' }}</div>
+        <div class="header-right">
+            <form action="{{ route('admin.products.index') }}" method="GET" class="inline-form">
+                <button type="submit">一覧へ戻る</button>
+            </form>
+        </div>
+    </div>
+@endsection
+
 @section('content')
 <div class="form-wrapper">
-    <h1>商品登録確認画面</h1>
+    <h1>{{ isset($data['id']) ? '商品編集確認' : '商品登録確認' }}</h1>
 
     <div>
+        <div class="form-row">
+            <label>商品ID</label>
+            {{ $data['id'] ?? '登録後に自動採番' }}
+        </div>
+
         <div class="form-row">
             <label>商品名</label>
             {{ $data['name'] ?? '' }}
@@ -48,16 +64,27 @@
             {{ $data['product_content'] ?? '' }}
         </div>
 
-        <form action="{{ route('admin.products.store') }}" method="POST">
+        @if(isset($data['id']))
+            <form action="{{ route('admin.products.update', $data['id']) }}" method="POST">
+                @csrf
+                @method('PUT')
+        @else
+            <form action="{{ route('admin.products.store') }}" method="POST">
+                @csrf
+        @endif
             @csrf
             <div>
-                <button type="submit" class="submit-button">商品を登録する</button>
+                <button type="submit" class="submit-button">
+                    {{ isset($data['id']) ? '更新する' : '登録する' }}
+                </button>
             </div>
         </form>
 
         <form action="{{ route('admin.products.back') }}" method="POST">
             @csrf
-            <button type="submit" class="submit-button-back">前に戻る</button>
+            <div>
+                <button type="submit" class="submit-button-back">前に戻る</button>
+            </div>
         </form>
     </div>
 </div>

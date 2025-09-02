@@ -3,24 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\ProductRequest;
-use App\Models\ProductSubcategory;
-use App\Models\ProductCategory;
-use Illuminate\Support\Facades\Storage;
-use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\ReviewRequest;
+use App\Models\Review;
 use Illuminate\Support\Str;
 
-class AdminProductController extends Controller
+class AdminReviewController extends Controller
 {
   /**
-   * 商品登録フォーム表示
+   * レビュー登録フォーム表示
    */
   public function create()
   {
-    $categories = ProductCategory::all();
-    return view('administers.products.create', compact('categories'));
+    $reviews = Review::all();
+    return view('administers.reviews.create', compact('reviews'));
   }
 
   /**
@@ -162,11 +157,11 @@ class AdminProductController extends Controller
   }
 
   /**
-   * 商品一覧
+   * レビュー一覧
    */
-  public function list(Request $request)
+  public function index(Request $request)
   {
-    $query = Product::query();
+    $query = Review::query();
 
     // 検索条件
     if ($request->filled('id')) {
@@ -177,8 +172,7 @@ class AdminProductController extends Controller
       $keyword = $request->keyword;
 
       $query->where(function ($q) use ($keyword) {
-        $q->where('name', 'like', "%{$keyword}%")
-          ->orWhere('product_content', 'like', "%{$keyword}%");
+        $q->where('comment', 'like', "%{$keyword}%");
       });
     }
 
@@ -194,10 +188,10 @@ class AdminProductController extends Controller
       $direction = 'desc';
     }
 
-    $products = $query->orderBy($sort, $direction)->paginate(10)->appends($request->query());;
+    $reviews = $query->orderBy($sort, $direction)->paginate(10)->appends($request->query());;
 
 
-    return view('administers.products.index', compact('products'));
+    return view('administers.reviews.index', compact('reviews'));
   }
 
   /**

@@ -156,9 +156,9 @@ class AdministerController extends Controller
       $member = Member::find($id);
 
       return view('administers.members.show', [
-      'member' => $member
-    ]);
-  }
+        'member' => $member
+      ]);
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -175,32 +175,32 @@ class AdministerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-  public function update(Request $request, string $id)
-  {
-    // セッションからデータ取得
-    $data = $request->session()->get('member_post_data');
+    public function update(Request $request, string $id)
+    {
+      // セッションからデータ取得
+      $data = $request->session()->get('member_post_data');
 
-    if (!$data) {
+      if (!$data) {
+        return redirect()
+          ->route('admin.members.edit', $id)
+          ->with('error', 'セッションが切れました。もう一度入力してください。');
+      }
+
+      unset($data['id']);
+
+      // 該当の会員を取得
+      $member = Member::findOrFail($id);
+      
+      // データ更新
+      $member->fill($data);
+      $member->save();
+
+      // セッションクリア
+      $request->session()->forget('member_post_data');
+
       return redirect()
-        ->route('admin.members.edit', $id)
-        ->with('error', 'セッションが切れました。もう一度入力してください。');
+        ->route('admin.members.index');
     }
-
-    unset($data['id']);
-
-    // 該当の会員を取得
-    $member = Member::findOrFail($id);
-    
-    // データ更新
-    $member->fill($data);
-    $member->save();
-
-    // セッションクリア
-    $request->session()->forget('member_post_data');
-
-    return redirect()
-      ->route('admin.members.index');
-  }
 
 
   /**

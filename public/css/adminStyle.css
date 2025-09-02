@@ -54,6 +54,20 @@ input[type="password"] {
     font-weight: bold;
 }
 
+.submit-button-back {
+    width: 230px;
+    background-color: white;
+    color: #007bff;
+    padding: 12px 40px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 50px;
+    font-weight: bold;
+}
+
 .error {
     color: red;
     font-size: 12px;
@@ -168,18 +182,6 @@ input[type="email"] {
     font-size: 14px;
 }
 
-.submit-button-back {
-    width: 230px;
-    background-color: white;
-    color: #007bff;
-    padding: 12px 40px;
-    border: 1px solid #007bff;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 30px;
-}
-
 .subcategory-list {
   display: flex;
   flex-direction: column; /* 縦方向に並べる */
@@ -188,4 +190,56 @@ input[type="email"] {
 
 .subcategory-item input {
   width: 300px; /* お好みで幅調整 */
+}
+
+.rating-row {
+  display: flex;
+  justify-content: center; /* 中央寄せ */
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 2px solid #9aa6ad;
+  width: 80%;
+  background: none;
+  font-weight: bold;
+  padding-top: 30px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.review-item-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  border-bottom: 1px solid #9aa6ad;
+  width: 30%;
+}
+
+.review-item {
+  display: flex;
+}
+
+.review-label {
+  font-weight: bold;
+}
+
+.review-id {
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+.rating-stars, .review-comment {
+  padding-left: 10px;
 }

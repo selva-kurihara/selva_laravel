@@ -45,6 +45,14 @@ class Product extends Model
   ];
 
   /**
+   * 会員とのリレーション
+   */
+  public function member()
+  {
+    return $this->belongsTo(Member::class, 'member_id');
+  }
+
+  /**
    * カテゴリとのリレーション
    */
   public function category()

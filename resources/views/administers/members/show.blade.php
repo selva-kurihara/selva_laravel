@@ -50,20 +50,17 @@
         </tr>
     </table>
 
-    {{-- 編集ボタン --}}
-    <form action="{{ route('admin.members.edit', $member->id) }}" method="GET">
-    <button type="submit" class="submit-button-back">編集</button>
-    </form>
+    <div class="button-group">
+        {{-- 編集ボタン --}}
+        <form action="{{ route('admin.members.edit', $member->id) }}" method="GET" style="display:inline-block;">
+        <button type="submit" class="submit-button-back">編集</button>
+        </form>
 
-    {{-- 削除ボタン --}}
-    <form action="{{ route('admin.members.destroy', $member->id) }}"
-        method="POST">
-        @csrf
-        <button type="submit"
-                class="submit-button-back">
-            削除
-        </button>
-    </form>
-    
+        {{-- 削除ボタン --}}
+        <form action="{{ route('admin.members.destroy', $member->id) }}" method="POST" style="display:inline-block;">
+            @csrf
+            <button type="submit" class="submit-button-back">削除</button>
+        </form>
+    </div>
 </div>
 @endsection

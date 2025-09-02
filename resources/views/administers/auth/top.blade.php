@@ -1,5 +1,5 @@
 @extends('admin')
-@section('title', 'ログイン')
+@section('title', '管理者トップページ')
 
 @section('header')        
   <div class="header-container"> 
@@ -22,15 +22,17 @@
     <form method="GET" action="{{ route('admin.members.index') }}" style="margin-top:10px;">
       <button type="submit" class="submit-button">会員一覧</button>
     </form>
-  </div>
-  <div class="form-wrapper"> 
+  
     <form method="GET" action="{{ route('admin.categories.index') }}" style="margin-top:10px;">
       <button type="submit" class="submit-button">商品カテゴリ一覧</button>
     </form>
-  </div>
-  <div class="form-wrapper"> 
+  
     <form method="GET" action="{{ route('admin.products.index') }}" style="margin-top:10px;">
       <button type="submit" class="submit-button">商品一覧</button>
+    </form>
+
+    <form method="GET" action="{{ route('admin.reviews.index') }}" style="margin-top:10px;">
+      <button type="submit" class="submit-button">レビュー一覧</button>
     </form>
   </div>
 @endsection

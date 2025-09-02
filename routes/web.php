@@ -12,6 +12,7 @@ use App\Http\Controllers\AdministerController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminProductController;
+use App\Http\Controllers\AdminReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -114,5 +115,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
       Route::put('products/{product}', [AdminProductController::class, 'update'])->name('products.update');
       Route::get('products/{product}', [AdminProductController::class, 'show'])->name('products.show');
       Route::post('products/{product}/destroy', [AdminProductController::class, 'destroy'])->name('products.destroy');
+
+      Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+      Route::get('reviews/create', [AdminReviewController::class, 'create'])->name('reviews.create');
+      Route::post('reviews/confirm', [AdminReviewController::class, 'confirm'])->name('reviews.confirm');
+      Route::post('reviews/store', [AdminReviewController::class, 'store'])->name('reviews.store');
+      Route::post('reviews/back', [AdminReviewController::class, 'back'])->name('reviews.back');
+      Route::get('reviews/{review}/edit', [AdminReviewController::class, 'edit'])->name('reviews.edit');
+      Route::put('reviews/{review}', [AdminReviewController::class, 'update'])->name('reviews.update');
+      Route::get('reviews/{review}', [AdminReviewController::class, 'show'])->name('reviews.show');
+      Route::post('reviews/{review}/destroy', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
   });
 });
