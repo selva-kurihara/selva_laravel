@@ -22,5 +22,15 @@
     <form method="GET" action="{{ route('admin.members.index') }}" style="margin-top:10px;">
       <button type="submit" class="submit-button">会員一覧</button>
     </form>
-  </div> 
+  </div>
+  <div class="form-wrapper"> 
+    <form method="GET" action="{{ route('admin.categories.index') }}" style="margin-top:10px;">
+      <button type="submit" class="submit-button">商品カテゴリ一覧</button>
+    </form>
+  </div>
+  <div class="form-wrapper"> 
+    <form method="GET" action="{{ route('admin.products.index') }}" style="margin-top:10px;">
+      <button type="submit" class="submit-button">商品一覧</button>
+    </form>
+  </div>
 @endsection

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nickname', 255)->comment('ニックネーム');
             $table->integer('gender')->comment('性別（1=男性、2=女性）');
             $table->string('password', 255)->comment('パスワード');
-            $table->string('email', 255)->comment('メールアドレス');
+            $table->string('email', 255)->unique()->comment('メールアドレス');
             $table->integer('auth_code')->nullable()->comment('認証コード');
             $table->timestamps();
             $table->softDeletes();

@@ -129,7 +129,7 @@ input[type="password"] {
 }
 
 .create-button-list {
-    width: 150px;
+    width: auto;
     background-color: #007bff;
     color: white;
     padding: 12px 40px;
@@ -178,4 +178,14 @@ input[type="email"] {
     font-size: 16px;
     cursor: pointer;
     margin-top: 30px;
+}
+
+.subcategory-list {
+  display: flex;
+  flex-direction: column; /* 縦方向に並べる */
+  gap: 8px; /* 入力欄の間隔 */
+}
+
+.subcategory-item input {
+  width: 300px; /* お好みで幅調整 */
 }

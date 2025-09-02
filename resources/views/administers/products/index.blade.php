@@ -1,10 +1,10 @@
 @extends('admin')
 
-@section('title', '会員一覧')
+@section('title', '商品一覧')
 
 @section('header')
     <div class="header-container">
-        <div class="header-left">会員一覧</div>
+        <div class="header-left">商品一覧</div>
         <div class="header-right">
             <form action="{{ route('admin.top') }}" method="GET" class="inline-form">
                 <button type="submit">トップへ戻る</button>
@@ -14,27 +14,14 @@
 @endsection
 
 @section('content')
-<form action="{{ route('admin.members.create') }}" method="GET">
-    <button type="submit" class="create-button-list">会員登録</button>
+<form action="{{ route('admin.products.create') }}" method="GET">
+    <button type="submit" class="create-button-list">商品登録</button>
 </form>
 <div class="form-wrapper">
-    <form method="GET" action="{{ route('admin.members.index') }}">
+    <form method="GET" action="{{ route('admin.products.index') }}">
         <div class="form-row">
             <label>ID</label>
             <input type="text" name="id" value="{{ request('id') }}">
-        </div>
-        <div class="form-row">
-            <label>性別</label>
-            <label>
-                <input type="checkbox" name="gender[]" value="1"
-                    {{ in_array('1', (array)request('gender', []), true) ? 'checked' : '' }}>
-                男性
-            </label>
-            <label>
-                <input type="checkbox" name="gender[]" value="2"
-                    {{ in_array('2', (array)request('gender', []), true) ? 'checked' : '' }}>
-                女性
-            </label>
         </div>
         <div class="form-row">
             <label>フリーワード</label>
@@ -61,16 +48,14 @@
             <thead>
                 <tr>
                     <th>
-                        <a href="{{ route('admin.members.index',
+                        <a href="{{ route('admin.products.index',
                             ['sort' => 'id', 'direction' => $nextDirId] + request()->except('page')) }}">
                             ID {{ ($currentSort === 'id' && $currentDir === 'asc') ? '▲' : '▼' }}
                         </a>
                     </th>
-                    <th>氏名</th>
-                    <th>メールアドレス</th>
-                    <th>性別</th>
+                    <th>商品名</th>
                     <th>
-                        <a href="{{ route('admin.members.index',
+                        <a href="{{ route('admin.products.index',
                             ['sort' => 'created_at', 'direction' => $nextDirCreated] + request()->except('page')) }}">
                             登録日時 {{ ($currentSort === 'created_at' && $currentDir === 'asc') ? '▲' : '▼' }}
                         </a>
@@ -80,23 +65,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($members as $member)
+                @foreach($products as $product)
                     <tr>
-                        <td>{{ $member->id }}</td>
-                        <td><a href="{{ route('admin.members.show', $member->id) }}">{{ $member->name_sei }} {{ $member->name_mei }}</a></td>
-                        <td>{{ $member->email }}</td>
-                        <td>
-                            @if($member->gender == 1)
-                                男性
-                            @elseif($member->gender == 2)
-                                女性
-                            @else
-                                不明
-                            @endif
-                        </td>
-                        <td>{{ $member->created_at->format('Y/m/d') }}</td>
-                        <td><a href="{{ route('admin.members.edit', $member->id) }}">編集</a></td>
-                        <td><a href="{{ route('admin.members.show', $member->id) }}">詳細</a></td>
+                        <td>{{ $product->id }}</td>
+                        <td>{{ $product->name }}</td>
+                        <td>{{ $product->created_at->format('Y/m/d') }}</td>
+                        <td><a href="{{ route('admin.products.edit', $product->id) }}">編集</a></td>
+                        <td><a href="{{ route('admin.products.show', $product->id) }}">詳細</a></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -106,8 +81,8 @@
     {{-- カスタムページネーション --}}
     @php
         $window = 3;
-        $totalPages  = $members->lastPage();
-        $currentPage = $members->currentPage();
+        $totalPages  = $products->lastPage();
+        $currentPage = $products->currentPage();
 
         // 基本は current の1つ前から
         $startPage = $currentPage - 1;
@@ -121,8 +96,8 @@
 
     <div class="pagination flex items-center gap-2">
         {{-- 前ページ --}}
-        @unless ($members->onFirstPage())
-            <a href="{{ $members->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
+        @unless ($products->onFirstPage())
+            <a href="{{ $products->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
         @endunless
 
         {{-- ページ番号 --}}
@@ -130,13 +105,13 @@
             @if ($i == $currentPage)
                 <span class="px-2 py-1 border rounded bg-purple-600 text-white text-sm">{{ $i }}</span>
             @else
-                <a href="{{ $members->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
+                <a href="{{ $products->url($i) }}" class="px-2 py-1 border rounded text-sm">{{ $i }}</a>
             @endif
         @endfor
 
         {{-- 次ページ --}}
-        @if ($members->hasMorePages())
-            <a href="{{ $members->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
+        @if ($products->hasMorePages())
+            <a href="{{ $products->nextPageUrl() }}" class="px-2 py-1 border rounded text-sm">次へ &gt;</a>
         @endif
     </div>
 

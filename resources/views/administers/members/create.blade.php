@@ -14,11 +14,24 @@
 
 @section('content')
     <div class="form-wrapper">
-        <form method="POST" action="{{ isset($member->id) ? route('admin.members.update', $member->id) : route('admin.members.confirm') }}">
-            @csrf
-            @if(isset($member->id))
-                @method('PUT')
+        <form method="POST" action="{{ route('admin.members.confirm') }}">
+            @csrf 
+
+            @if(isset($member->id)) 
+            <input type="hidden" name="id" value="{{ $member->id }}"> 
             @endif
+
+            <div class="form-row">
+                <label>ID</label>
+                <div class="name-inputs">
+                    @if(isset($member->id)) 
+                        {{ $member->id }}
+                    @else
+                        登録後に自動採番
+                    @endif
+                </div>
+            </div>
+
             <div class="form-row">
                 <label>氏名</label>
                 <div class="name-inputs">
@@ -98,6 +111,7 @@
                 </div>
             @enderror
 
+            <input type="hidden" name="id" value="{{$member->id}}">
             <button type="submit" class="submit-button">確認画面へ</button>
         </form>
     </div>

@@ -10,6 +10,8 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AdministerController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\AdminProductController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -90,5 +92,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
       Route::post('members/store', [AdministerController::class, 'store'])->name('members.store');
       Route::get('members/{member}/edit', [AdministerController::class, 'edit'])->name('members.edit');
       Route::put('members/{member}', [AdministerController::class, 'update'])->name('members.update');
+      Route::get('members/{member}', [AdministerController::class, 'show'])->name('members.show');
+      Route::post('members/{member}/destroy', [AdministerController::class, 'destroy'])->name('members.destroy');
+
+      Route::get('categories', [CategoryController::class, 'categoriesIndex'])->name('categories.index');
+      Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+      Route::post('categories/confirm', [CategoryController::class, 'confirm'])->name('categories.confirm');
+      Route::post('categories/store', [CategoryController::class, 'store'])->name('categories.store');
+      Route::post('categories/back', [CategoryController::class, 'back'])->name('categories.back');
+      Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+      Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+      Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+      Route::post('categories/{category}/destroy', [CategoryController::class, 'destroy'])->name('categories.destroy');
+
+      Route::get('products', [AdminProductController::class, 'list'])->name('products.index');
+      Route::get('products/create', [AdminProductController::class, 'create'])->name('products.create');
+      Route::post('products/confirm', [AdminProductController::class, 'confirm'])->name('products.confirm');
+      Route::post('products/store', [AdminProductController::class, 'store'])->name('products.store');
+      Route::post('products/back', [AdminProductController::class, 'back'])->name('products.back');
+      Route::get('products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+      Route::put('products/{product}', [AdminProductController::class, 'update'])->name('products.update');
+      Route::get('products/{product}', [AdminProductController::class, 'show'])->name('products.show');
+      Route::post('products/{product}/destroy', [AdminProductController::class, 'destroy'])->name('products.destroy');
   });
 });

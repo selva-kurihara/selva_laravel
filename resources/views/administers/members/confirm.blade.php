@@ -42,7 +42,7 @@
             <div class="form-row">
               <label>パスワード</label>
               <div class="name-inputs">
-                  ********
+                  セキュリティのため非表示
               </div>
             </div>
           
@@ -62,15 +62,6 @@
             <form method="POST" action="{{ route('admin.members.store') }}">
                 @csrf
             @endif
-
-            {{-- hiddenで値を保持 --}}
-            <input type="hidden" name="name_sei" value="{{ $data['name_sei'] }}">
-            <input type="hidden" name="name_mei" value="{{ $data['name_mei'] }}">
-            <input type="hidden" name="nickname" value="{{ $data['nickname'] }}">
-            <input type="hidden" name="gender" value="{{ $data['gender'] }}">
-            <input type="hidden" name="email" value="{{ $data['email'] }}">
-            <input type="hidden" name="password" value="{{ $data['password'] }}">
-            <input type="hidden" name="password_confirmation" value="{{ $data['password_confirmation'] }}">
 
             <button type="submit" class="submit-button">
                 {{ isset($data['id']) ? '更新する' : '登録完了' }}
