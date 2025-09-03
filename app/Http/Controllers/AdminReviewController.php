@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ReviewRequest;
 use App\Models\Review;
 use Illuminate\Support\Str;
+use App\Models\Product;
+use App\Models\Member;
+use Illuminate\Support\Facades\Storage;
 
 class AdminReviewController extends Controller
 {
@@ -14,92 +17,82 @@ class AdminReviewController extends Controller
    */
   public function create()
   {
-    $reviews = Review::all();
-    return view('administers.reviews.create', compact('reviews'));
-  }
+    // 紐づく商品一覧を取得
+    $products = Product::all();
 
-  /**
-   * サブカテゴリ取得（AJAX）
-   */
-  public function getSubcategories($categoryId)
-  {
-    $subcategories = ProductSubcategory::where('product_category_id', $categoryId)->get();
-    return response()->json($subcategories);
+    // 紐づく会員一覧を取得
+    $members = Member::all();
+
+    return view('administers.reviews.create', compact('products', 'members'));
   }
 
   /**
    * 確認画面表示
    */
-  public function confirm(ProductRequest $request)
+  public function confirm(ReviewRequest $request)
   {
-    $paths = [];
+    $validated = $request->validated();
 
-    for ($i = 0; $i < 4; $i++) {
-      if ($request->hasFile("images.$i") && $request->file("images.$i")->isValid()) {
-        $paths[$i] = $request->file("images.$i")->store('tmp/products', 'public');
-      } else {
-        $paths[$i] = $request->input("imagePaths.$i") ?? '';
-      }
+    // 編集時は hidden で送られてくる id を追加
+    if ($request->has('id')) {
+      $validated['id'] = $request->input('id');
     }
 
-    $data = $request->except('images');
-    $data['imagePaths'] = $paths;
+    // セッションに保存
+    $request->session()->put('review_post_data', $validated);
 
-    $request->session()->put('product_post_data', $data);
-    $request->session()->put('tmp_image_paths', $paths);
+    // 紐づく商品名と会員名を取得
+    $product = Product::withCount('reviews')->withAvg('reviews', 'evaluation')->find($validated['product_id']);
+    $member  = Member::find($validated['member_id']);
 
-    $categoryName    = ProductCategory::find($data['product_category_id'])->name ?? '';
-    $subcategoryName = ProductSubcategory::find($data['product_subcategory_id'])->name ?? '';
+    // 商品写真（1枚目のみ）
+    $firstImagePath = null;
+    if ($product) {
+        foreach (['image_1', 'image_2', 'image_3', 'image_4'] as $col) {
+            $p = $product->{$col} ?? null;
+            if (is_string($p) && $p !== '') {
+                $firstImagePath = $p;
+                break;
+            }
+        }
+    }
 
-    return view('administers.products.confirm', [
-      'data'            => $data,
-      'categoryName'    => $categoryName,
-      'subcategoryName' => $subcategoryName,
-      'imagePaths'      => $paths,
+    return view('administers.reviews.confirm', [
+      'data'        => $validated,
+      'product' => $product,
+      'member'  => $member,
+      'firstImagePath' => $firstImagePath,
     ]);
   }
+
 
   public function edit(string $id)
   {
-    // 商品を取得（カテゴリも一緒に取得）
-    $product = Product::with('category.subCategories')->findOrFail($id);
+    // 編集対象のレビューを取得
+    $review = Review::findOrFail($id);
 
-    // 商品のカテゴリ
-    $category = $product->category;
+    // 紐づく商品一覧を取得
+    $products = Product::all();
 
-    // サブカテゴリ（カテゴリが存在しなければ空コレクション）
-    $subcategories = $category->subCategories ?? collect();
+    // 紐づく会員一覧を取得
+    $members = Member::all();
 
-    // 全カテゴリ一覧（編集画面で選択肢に使う場合）
-    $categories = ProductCategory::all();
-
-    $initialImagePaths = [];
-    for ($i = 1; $i <= 4; $i++) {
-        $col = 'image_' . $i;
-        $initialImagePaths[$i - 1] = $product->$col ?: '';
-    }
-
-    return view('administers.products.create', [
-      'category' => $category,
-      'subcategories' => $subcategories,
-      'categories' => $categories, // これを追加
-      'product' => $product,
-      'initialImagePaths' => $initialImagePaths,
-    ]);
+    return view('administers.reviews.create', compact('review', 'products', 'members'));
   }
+
 
   /**
    * 戻るボタン処理
    */
   public function back(Request $request)
   {
-    $data = $request->session()->get('product_post_data', []);
+    $data = $request->session()->get('review_post_data', []);
 
     if (!empty($data['id'])) {
-      return redirect()->route('admin.products.edit', $data['id'])->withInput($data);
+      return redirect()->route('admin.reviews.edit', $data['id'])->withInput($data);
     }
 
-    return redirect()->route('admin.products.create')->withInput($data);
+    return redirect()->route('admin.reviews.create')->withInput($data);
   }
 
   /**
@@ -107,53 +100,18 @@ class AdminReviewController extends Controller
    */
   public function store(Request $request)
   {
-    $data = $request->session()->get('product_post_data');
+    $data = $request->session()->get('review_post_data');
 
     if (!$data) {
-      return redirect()->route('admin.products.create')->with('error', 'セッションが切れました。もう一度入力してください。');
+      return redirect()->route('admin.reviews.create')->with('error', 'セッションが切れました。もう一度入力してください。');
     }
 
-    $paths    = $data['imagePaths'] ?? [];
-    for ($i = 0; $i < 4; $i++) {
-      $paths[$i] = $paths[$i] ?? null;
-    }
+    $review = Review::create($data);
 
-    DB::transaction(function () use (&$product, $paths, $data) {
-      $dir = 'products/' . date('Y/m/d') . '/' . Str::random(8);
-      Storage::disk('public')->makeDirectory($dir);
+    // セッション破棄
+    $request->session()->forget('review_post_data');
 
-      $final = [null, null, null, null];
-      for ($i = 0; $i < 4; $i++) {
-        $p = $paths[$i];
-        if ($p) {
-          if (!str_starts_with($p, 'tmp/products/')) {
-            throw new \RuntimeException('invalid image path: ' . $p);
-          }
-          $new = $dir . '/' . basename($p);
-          Storage::disk('public')->move($p, $new);
-          $final[$i] = $new;
-        }
-      }
-
-      $insertData = [
-        'member_id'               => "0",
-        'product_category_id'     => $data['product_category_id'],
-        'product_subcategory_id'  => $data['product_subcategory_id'],
-        'name'                    => $data['name'],
-        'image_1'                 => $final[0],
-        'image_2'                 => $final[1],
-        'image_3'                 => $final[2],
-        'image_4'                 => $final[3],
-        'product_content'         => $data['product_content'],
-      ];
-
-      $product = Product::create($insertData);
-    });
-
-    $request->session()->forget('product_post_data');
-    $request->session()->forget('tmp_image_paths');
-
-    return redirect()->route('admin.products.index');
+    return redirect()->route('admin.reviews.index');
   }
 
   /**
@@ -199,17 +157,17 @@ class AdminReviewController extends Controller
    */
   public function update(Request $request, string $id)
   {
-    $data = $request->session()->pull('product_post_data');
+    $data = $request->session()->pull('review_post_data');
 
     if (!$data) {
-      return redirect()->route('admin.products.edit', $id)->with('error', 'セッションが切れました。もう一度入力してください。');
+      return redirect()->route('admin.reviews.edit', $id)->with('error', 'セッションが切れました。もう一度入力してください。');
     }
 
     unset($data['id']);
 
-    $product = Product::findOrFail($id);
-    $product->update($data);
-    return redirect()->route('admin.products.index');
+    $review = Review::findOrFail($id);
+    $review->update($data);
+    return redirect()->route('admin.reviews.index');
   }
 
   /**
@@ -217,57 +175,34 @@ class AdminReviewController extends Controller
    */
   public function show(string $id)
   {
-    $product = Product::with([
-        'category.subCategories',
-        'member:id,name_sei,name_mei,nickname',
-    ])->findOrFail($id);
+    $review = Review::with(['product', 'member'])->findOrFail($id);
 
-    // カテゴリ名／サブカテゴリ名（null安全）
-    $categoryName    = optional($product->category)->name ?? '';
-    $subcategoryName = '';
-    if ($product->product_subcategory_id && $product->category) {
-        $match = $product->category->subCategories
-            ->firstWhere('id', $product->product_subcategory_id);
-        $subcategoryName = $match->name ?? '';
-    }
+    $product = Product::withCount('reviews')->withAvg('reviews', 'evaluation')->find($review->product_id);
+    $member = Member::find($review->member_id);
 
-    // 画像パス配列（image_1〜4）
-    $imagePaths = [];
-    for ($i = 1; $i <= 4; $i++) {
-        $col = 'image_' . $i;
-        if (!empty($product->$col)) {
-            $imagePaths[] = Storage::url($product->$col);
+    $firstImagePath = null;
+    if ($product) {
+        foreach (['image_1', 'image_2', 'image_3', 'image_4'] as $col) {
+            $p = $product->{$col} ?? null;
+            if (is_string($p) && $p !== '') {
+                $firstImagePath = $p;
+                break;
+            }
         }
     }
 
-    // レビュー集計
-    $reviewQuery = $product->reviews(); 
-    $reviewCount = $reviewQuery->count();
-    $reviewAvg   = $reviewCount ? round($reviewQuery->avg('evaluation'), 1) : null;
-    $reviews = $product->reviews()
-        ->with('member:id,name_sei,name_mei,nickname')
-        ->orderByDesc('id')
-        ->paginate(3);
-
-    $member = $product->member;
-
-    return view('administers.products.show', compact(
-        'product', 'categoryName', 'subcategoryName', 'imagePaths', 'reviewCount', 'reviewAvg', 'member', 'reviews'
-    ));
+    return view('administers.reviews.show', compact('review', 'product', 'member', 'firstImagePath'));
   }
 
+
   /**
-   * 商品削除
+   * 削除
    */
   public function destroy(string $id)
   {
-    $product = Product::with('reviews')->findOrFail($id);
+    $review = Review::findOrFail($id);
+    $review->delete();
 
-    foreach ($product->reviews as $review) {
-      $review->delete();
-    }
-    $product->delete();
-
-    return redirect()->route('admin.products.index');
+    return redirect()->route('admin.reviews.index');
   }
 }

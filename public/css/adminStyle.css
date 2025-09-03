@@ -243,3 +243,23 @@ input[type="email"] {
 .rating-stars, .review-comment {
   padding-left: 10px;
 }
+
+.product-container {
+  display: flex;
+  align-items: flex-start; /* 上揃え（中央にしたければ center） */
+  gap: 20px;              /* 画像と情報の間隔 */
+}
+
+.product-image {
+  flex: 0 0 auto;         /* 幅固定（画像分だけ） */
+}
+
+.product-info {
+  flex: 1;                /* 残りスペースを使う */
+}
+
+.review-container {
+  margin-top: 20px;
+  border-top: 1px solid #9aa6ad;
+  padding-top: 20px;
+}

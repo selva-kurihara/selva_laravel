@@ -23,10 +23,19 @@ class ReviewRequest extends FormRequest
    */
   public function rules(): array
   {
-    return [
+    $rules = [
       'evaluation' => ['required', 'integer', 'min:1', 'max:5'],
-      'comment' => ['required', 'string', 'max:500'],
+      'comment'    => ['required', 'string', 'max:500'],
     ];
+
+    // 管理画面からのアクセスかどうか判定
+    // 例: ルート名が "admin.reviews.*" の場合
+    if ($this->routeIs('admin.reviews.*')) {
+      $rules['product_id'] = ['required', 'integer', 'exists:products,id'];
+      $rules['member_id']  = ['required', 'integer', 'exists:members,id'];
+    }
+
+    return $rules;
   }
 
   /**
@@ -39,6 +48,8 @@ class ReviewRequest extends FormRequest
     return [
       'evaluation' => '評価',
       'comment' => '商品コメント',
+      'product_id' => '商品',
+      'member_id' => '会員',
     ];
   }
 }

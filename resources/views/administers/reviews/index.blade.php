@@ -70,9 +70,9 @@
                 @foreach($reviews as $review)
                     <tr>
                         <td>{{ $review->id }}</td>
-                        <td><a href="{{ route('admin.reviews.show', $review->id) }}">{{ $review->product_id }}</a></td>
+                        <td>{{ $review->product_id }}</td>
                         <td>{{ $review->evaluation }}</td>
-                        <td>{{ $review->comment }}</td>
+                        <td><a href="{{ route('admin.reviews.show', $review->id) }}" class="text-blue-600 underline">{{ \Illuminate\Support\Str::limit($review->comment, 50) }}</a></td>
                         <td>{{ $review->created_at->format('Y/m/d') }}</td>
                         <td><a href="{{ route('admin.reviews.edit', $review->id) }}">編集</a></td>
                         <td><a href="{{ route('admin.reviews.show', $review->id) }}">詳細</a></td>
@@ -101,7 +101,7 @@
     <div class="pagination flex items-center gap-2">
         {{-- 前ページ --}}
         @unless ($reviews->onFirstPage())
-            <a href="{{ $products->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
+            <a href="{{ $reviews->previousPageUrl() }}" class="px-2 py-1 border rounded text-sm">&lt; 前へ</a>
         @endunless
 
         {{-- ページ番号 --}}
