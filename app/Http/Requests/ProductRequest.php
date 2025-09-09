@@ -47,7 +47,7 @@ class ProductRequest extends FormRequest
    */
   public function rules(): array
   {
-    return [
+    $rules = [
       'name' => ['required', 'string', 'max:100'],
 
       'product_category_id' => [
@@ -69,6 +69,12 @@ class ProductRequest extends FormRequest
 
       'product_content' => ['required', 'string', 'max:500'],
     ];
+
+    if ($this->routeIs('admin.products.*')) {
+      $rules['member_id'] = ['required', 'integer', Rule::exists('members', 'id')];
+    }
+
+    return $rules;
   }
 
   /**
@@ -80,6 +86,7 @@ class ProductRequest extends FormRequest
   {
     return [
       'name' => '商品名',
+      'member_id' => '会員',
       'product_category_id' => '商品カテゴリ大',
       'product_subcategory_id' => '商品カテゴリ小',
       'imagePaths.0' => '商品写真1',

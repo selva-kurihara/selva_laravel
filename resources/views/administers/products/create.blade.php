@@ -35,6 +35,24 @@
     </div>
 
     <div class="form-row">
+        <label>会員</label>
+        <select name="member_id">
+            <option value="">選択してください</option>
+            @foreach($members as $member)
+                <option value="{{ $member->id }}"
+                    {{ old('member_id', $product->member_id ?? '') == $member->id ? 'selected' : '' }}>
+                    {{ $member->name_sei }}{{ $member->name_mei }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    @error('member_id')
+        <div class="error">
+            ※{{ $message }}
+        </div>
+    @enderror
+
+    <div class="form-row">
         <label>商品名</label>
         <input type="text" name="name" value="{{ old('name', $product->name ?? '') }}">
     </div>
@@ -137,6 +155,10 @@
         </div>
     </div>
     @for ($i = 0; $i < 4; $i++)
+        <span class="file-error" aria-live="polite"></span>
+    @endfor
+
+    @for ($i = 0; $i < 4; $i++)
         @php $msg = $errors->first("images.$i") ?: $errors->first("imagePaths.$i"); @endphp
         @if ($msg)
         <div class="error">画像{{ $i + 1 }}: {{ $msg }}</div>
@@ -193,20 +215,49 @@
     });
 
     function previewImage(event, index) {
-        const input = event.target;
-        const preview = document.getElementById('preview' + index);
+        const input   = event.target;
+        const slot    = input.closest('.image-slot');
+        const preview = slot.querySelector('#preview' + index);
+        const errorEl = document.querySelectorAll('.file-error')[index];
 
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.style.display = 'inline';
-            }
-            reader.readAsDataURL(input.files[0]);
+        // 初期化
+        if (errorEl) errorEl.textContent = '';
 
-            // hiddenフィールドを空にして「新しい画像を選んだ」ことを明示
-            input.closest('div').querySelector('input[type=hidden]').value = '';
+        const file = input.files && input.files[0];
+        if (!file) {
+            preview.removeAttribute('src');
+            preview.style.display = 'none';
+            return;
         }
+
+        const allowed = ['image/jpeg','image/png','image/gif','image/webp'];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        if (!allowed.includes(file.type)) {
+            if (errorEl) errorEl.textContent = '画像ファイル（JPEG/PNG/GIF/WebP）を選択してください。';
+            input.value = '';
+            preview.removeAttribute('src');
+            preview.style.display = 'none';
+            return;
+        }
+        if (file.size > maxSize) {
+            if (errorEl) errorEl.textContent = 'ファイルサイズは10MB以下にしてください。';
+            input.value = '';
+            preview.removeAttribute('src');
+            preview.style.display = 'none';
+            return;
+        }
+
+        // バリデーションOKになってから hidden を空にする
+        const hidden = slot.querySelector('input[type=hidden]');
+        if (hidden) hidden.value = '';
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = 'inline';
+        };
+        reader.readAsDataURL(file);
     }
 </script>
 @endsection

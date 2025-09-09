@@ -11,6 +11,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Member;
 
 class AdminProductController extends Controller
 {
@@ -20,7 +21,8 @@ class AdminProductController extends Controller
   public function create()
   {
     $categories = ProductCategory::all();
-    return view('administers.products.create', compact('categories'));
+    $members = Member::all();
+    return view('administers.products.create', compact('categories', 'members'));
   }
 
   /**
@@ -55,9 +57,11 @@ class AdminProductController extends Controller
 
     $categoryName    = ProductCategory::find($data['product_category_id'])->name ?? '';
     $subcategoryName = ProductSubcategory::find($data['product_subcategory_id'])->name ?? '';
+    $member = Member::find($data['member_id']);
 
     return view('administers.products.confirm', [
       'data'            => $data,
+      'member'          => $member,
       'categoryName'    => $categoryName,
       'subcategoryName' => $subcategoryName,
       'imagePaths'      => $paths,
@@ -78,6 +82,8 @@ class AdminProductController extends Controller
     // 全カテゴリ一覧（編集画面で選択肢に使う場合）
     $categories = ProductCategory::all();
 
+    $members = Member::all();
+
     $initialImagePaths = [];
     for ($i = 1; $i <= 4; $i++) {
         $col = 'image_' . $i;
@@ -90,6 +96,7 @@ class AdminProductController extends Controller
       'categories' => $categories, // これを追加
       'product' => $product,
       'initialImagePaths' => $initialImagePaths,
+      'members' => $members,
     ]);
   }
 

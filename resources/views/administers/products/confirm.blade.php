@@ -24,6 +24,11 @@
         </div>
 
         <div class="form-row">
+            <label>会員</label>
+            {{ $member->name_sei ?? '' }}{{ $member->name_mei ?? '' }}
+        </div>
+
+        <div class="form-row">
             <label>商品名</label>
             {{ $data['name'] ?? '' }}
         </div>

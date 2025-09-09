@@ -101,6 +101,9 @@
                 <div>
                     <span class="review-label">商品コメント</span>
                     <span class="review-comment">{{ $rev->comment }}</span>
+                    <span class="review-detail">
+                        <a href="{{ route('admin.reviews.show', $rev->id) }}">詳細</a>
+                    </span>
                 </div>
             </div>
         @endforeach

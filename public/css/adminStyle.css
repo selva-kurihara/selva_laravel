@@ -75,6 +75,13 @@ input[type="password"] {
     margin-bottom: 10px;
 }
 
+.file-error {
+    color: red;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 10px;
+}
+
 .header-container {
   display: flex;
   align-items: center;
@@ -262,4 +269,21 @@ input[type="email"] {
   margin-top: 20px;
   border-top: 1px solid #9aa6ad;
   padding-top: 20px;
+}
+
+.review-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #7ea8e6;
+  border: 1px solid #7ea8e6;
+  border-radius: 6px;
+  text-decoration: none;
+  line-height: 1.2;
+  cursor: pointer;
+  margin-left: 30px;
+  margin-bottom: 10px;
 }
